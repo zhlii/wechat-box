@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+    wx-box:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        container_name: "wx-box"
+        environment:
+            VNC_PASSWORD: "1"
+        ports:
+            - "8080:8080"
+            - "8888:8888"
+            - "8889:8889"
+        volumes:
+            - "./WeChat_Files/:/root/WeChat Files/"
+        extra_hosts:
+            - "dldir1.qq.com:127.0.0.1"
+        tty: true
