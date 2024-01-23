@@ -19,6 +19,14 @@ function errmonitor() {
                 xdotool windowkill $i
             fi
         done
+        for i in `xdotool search --onlyvisible --class TxBugReport.exe`
+        do
+            NAME=`xdotool getwindowname $i`
+            echo "window name: $NAME"
+            if [ "$NAME" == "错误报告" ]; then
+                xdotool windowkill $i
+            fi
+        done
         sleep 1
     done
 }
