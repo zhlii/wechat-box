@@ -3,22 +3,26 @@
 #include "log.h"
 #include "util.h"
 
-#define LOGGER_NAME      "WCF"
+#define LOGGER_NAME "WCF"
 #define LOGGER_FILE_NAME "/logs/wcf.txt"
-#define LOGGER_MAX_SIZE  1024 * 1024 * 10 // 10M
-#define LOGGER_MAX_FILES 10               // 10 files
+#define LOGGER_MAX_SIZE 1024 * 1024 * 10 // 10M
+#define LOGGER_MAX_FILES 10              // 10 files
 
 void InitLogger(std::string path)
 {
     static std::shared_ptr<spdlog::logger> logger = nullptr;
-    if (logger != nullptr) {
+    if (logger != nullptr)
+    {
         return;
     }
 
     auto filename = std::filesystem::path(path + LOGGER_FILE_NAME).make_preferred().string();
-    try {
+    try
+    {
         logger = spdlog::rotating_logger_mt(LOGGER_NAME, filename, LOGGER_MAX_SIZE, LOGGER_MAX_FILES);
-    } catch (const spdlog::spdlog_ex &ex) {
+    }
+    catch (const spdlog::spdlog_ex &ex)
+    {
         MessageBox(NULL, String2Wstring(ex.what()).c_str(), L"Init LOGGER ERROR", 0);
     }
 
@@ -36,14 +40,16 @@ void InitLogger(std::string path)
 #if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
 
 #define BUF_SIZE (1024 * 1024)
-static char buf[BUF_SIZE] = { 0 };
+static char buf[BUF_SIZE] = {0};
 
 void log_buffer(uint8_t *buffer, size_t len)
 {
     size_t j = sprintf_s(buf, BUF_SIZE, "BUF[%ld]: ", len);
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++)
+    {
         j += sprintf_s(buf + j, BUF_SIZE, "%02X ", buffer[i]);
-        if (j > BUF_SIZE - 3) {
+        if (j > BUF_SIZE - 3)
+        {
             break;
         }
     }

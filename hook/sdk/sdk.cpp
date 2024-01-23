@@ -10,23 +10,28 @@
 
 #define WCF_LOCK ".wcf.lock"
 
-static bool debugMode             = false;
-static HANDLE wcProcess           = NULL;
-static HMODULE spyBase            = NULL;
-static WCHAR spyDllPath[MAX_PATH] = { 0 };
+static bool debugMode = false;
+static HANDLE wcProcess = NULL;
+static HMODULE spyBase = NULL;
+static WCHAR spyDllPath[MAX_PATH] = {0};
 
 static int GetDllPath(bool debug, wchar_t *dllPath)
 {
     GetModuleFileName(GetModuleHandle(WECHATSDKDLL), spyDllPath, MAX_PATH);
     PathRemoveFileSpec(spyDllPath);
-    if (debug) {
+    if (debug)
+    {
         PathAppend(spyDllPath, WECHATINJECTDLL_DEBUG);
-    } else {
+    }
+    else
+    {
         PathAppend(spyDllPath, WECHATINJECTDLL);
     }
 
-    if (!PathFileExists(spyDllPath)) {
-        MessageBox(NULL, spyDllPath, L"文件不存在", 0);
+    if (!PathFileExists(spyDllPath))
+    {
+        // MessageBox(NULL, spyDllPath, L"文件不存在", 0);
+        LOG_ERROR("文件不存在")
         return ERROR_FILE_NOT_FOUND;
     }
 
@@ -35,40 +40,49 @@ static int GetDllPath(bool debug, wchar_t *dllPath)
 
 int WxInitSDK(bool debug, int port)
 {
-    int status  = 0;
+    int status = 0;
     DWORD wcPid = 0;
 
     status = GetDllPath(debug, spyDllPath);
-    if (status != 0) {
+    if (status != 0)
+    {
         return status;
     }
 
     status = OpenWeChat(&wcPid);
-    if (status != 0) {
-        MessageBox(NULL, L"打开微信失败", L"WxInitSDK", 0);
+    if (status != 0)
+    {
+        // MessageBox(NULL, L"打开微信失败", L"WxInitSDK", 0);
+        LOG_ERROR("打开微信失败")
         return status;
     }
 
     Sleep(2000); // 等待微信打开
     wcProcess = InjectDll(wcPid, spyDllPath, &spyBase);
-    if (wcProcess == NULL) {
-        MessageBox(NULL, L"注入失败", L"WxInitSDK", 0);
+    if (wcProcess == NULL)
+    {
+        // MessageBox(NULL, L"注入失败", L"WxInitSDK", 0);
+        LOG_ERROR("注入失败")
         return -1;
     }
 
-    PortPath_t pp = { 0 };
-    pp.port       = port;
+    PortPath_t pp = {0};
+    pp.port = port;
     sprintf_s(pp.path, MAX_PATH, "%s", std::filesystem::current_path().string().c_str());
 
-    if (!CallDllFuncEx(wcProcess, spyDllPath, spyBase, "InitSpy", (LPVOID)&pp, sizeof(PortPath_t), NULL)) {
-        MessageBox(NULL, L"初始化失败", L"WxInitSDK", 0);
+    if (!CallDllFuncEx(wcProcess, spyDllPath, spyBase, "InitSpy", (LPVOID)&pp, sizeof(PortPath_t), NULL))
+    {
+        // MessageBox(NULL, L"初始化失败", L"WxInitSDK", 0);
+        LOG_ERROR("初始化失败")
         return -1;
     }
 
 #ifdef WCF
     FILE *fd = fopen(WCF_LOCK, "wb");
-    if (fd == NULL) {
-        MessageBox(NULL, L"无法打开lock文件", L"WxInitSDK", 0);
+    if (fd == NULL)
+    {
+        // MessageBox(NULL, L"无法打开lock文件", L"WxInitSDK", 0);
+        LOG_ERROR("无法打开lock文件")
         return -2;
     }
     fwrite((uint8_t *)&debug, sizeof(debug), 1, fd);
@@ -85,20 +99,26 @@ int WxDestroySDK()
 #ifdef WCF
     bool debug;
     DWORD pid = GetWeChatPid();
-    if (pid == 0) {
-        MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
+    if (pid == 0)
+    {
+        // MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
+        LOG_ERROR("微信未运行")
         return status;
     }
 
     wcProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-    if (wcProcess == NULL) {
-        MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
+    if (wcProcess == NULL)
+    {
+        // MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
+        LOG_ERROR("微信未运行")
         return -1;
     }
 
     FILE *fd = fopen(WCF_LOCK, "rb");
-    if (fd == NULL) {
-        MessageBox(NULL, L"无法打开lock文件", L"WxDestroySDK", 0);
+    if (fd == NULL)
+    {
+        // MessageBox(NULL, L"无法打开lock文件", L"WxDestroySDK", 0);
+        LOG_ERROR("无法打开lock文件")
         return -2;
     }
     fread((uint8_t *)&debug, sizeof(debug), 1, fd);
@@ -109,15 +129,18 @@ int WxDestroySDK()
     status = GetDllPath(debugMode, spyDllPath);
 #endif
 
-    if (status != 0) {
+    if (status != 0)
+    {
         return status;
     }
 
-    if (!CallDllFunc(wcProcess, spyDllPath, spyBase, "CleanupSpy", NULL, NULL)) {
+    if (!CallDllFunc(wcProcess, spyDllPath, spyBase, "CleanupSpy", NULL, NULL))
+    {
         return -1;
     }
 
-    if (!EjectDll(wcProcess, spyBase)) {
+    if (!EjectDll(wcProcess, spyBase))
+    {
         return -1; // TODO: Unify error codes
     }
 
