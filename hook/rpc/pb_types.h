@@ -8,7 +8,8 @@ using namespace std;
 
 typedef map<int, string> MsgTypes_t;
 
-typedef struct {
+typedef struct
+{
     int32_t gender;
     string wxid;
     string code;
@@ -21,13 +22,15 @@ typedef struct {
 
 typedef vector<string> DbNames_t;
 
-typedef struct {
+typedef struct
+{
     string name;
     string sql;
 } DbTable_t;
 typedef vector<DbTable_t> DbTables_t;
 
-typedef struct {
+typedef struct
+{
     int32_t type;
     string column;
     vector<uint8_t> content;
@@ -35,13 +38,15 @@ typedef struct {
 typedef vector<DbField_t> DbRow_t;
 typedef vector<DbRow_t> DbRows_t;
 
-typedef struct {
+typedef struct
+{
     bool is_self;
     bool is_group;
     uint32_t type;
     uint32_t ts;
     uint64_t id;
     string sender;
+    string receiver;
     string roomid;
     string content;
     string sign;
@@ -50,14 +55,16 @@ typedef struct {
     string xml;
 } WxMsg_t;
 
-typedef struct {
+typedef struct
+{
     string wxid;
     string name;
     string mobile;
     string home;
 } UserInfo_t;
 
-typedef struct {
+typedef struct
+{
     int32_t status;
     string result;
 } OcrResult_t;

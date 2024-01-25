@@ -84,18 +84,19 @@ message Empty { }
 
 message WxMsg
 {
-    bool is_self   = 1;  // 是否自己发送的
-    bool is_group  = 2;  // 是否群消息
-    uint64 id      = 3;  // 消息 id
-    uint32 type    = 4;  // 消息类型
-    uint32 ts      = 5;  // 消息类型
-    string roomid  = 6;  // 群 id（如果是群消息的话）
-    string content = 7;  // 消息内容
-    string sender  = 8;  // 消息发送者
-    string sign    = 9;  // Sign
-    string thumb   = 10; // 缩略图
-    string extra   = 11; // 附加内容
-    string xml     = 12; // 消息 xml
+    bool is_self    = 1;  // 是否自己发送的
+    bool is_group   = 2;  // 是否群消息
+    uint64 id       = 3;  // 消息 id
+    uint32 type     = 4;  // 消息类型
+    uint32 ts       = 5;  // 消息类型
+    string roomid   = 6;  // 群 id（如果是群消息的话）
+    string content  = 7;  // 消息内容
+    string sender   = 8;  // 消息发送者
+    string sign     = 9;  // Sign
+    string thumb    = 10; // 缩略图
+    string extra    = 11; // 附加内容
+    string xml      = 12; // 消息 xml
+    string receiver = 13; // 消息接收者
 }
 
 message TextMsg
