@@ -1,4 +1,5 @@
 ﻿#include "injector.h"
+#include "log.h"
 
 HANDLE InjectDll(DWORD pid, LPCWSTR dllPath, HMODULE *injectedBase)
 {
@@ -8,9 +9,8 @@ HANDLE InjectDll(DWORD pid, LPCWSTR dllPath, HMODULE *injectedBase)
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if (hProcess == NULL)
     {
-        // TODO: 取消弹窗
         // MessageBox(NULL, L"打开进程失败", L"InjectDll", 0);
-        LOG_ERROR("打开进程失败")
+        LOG_ERROR("打开进程失败");
         return NULL;
     }
 
@@ -19,7 +19,7 @@ HANDLE InjectDll(DWORD pid, LPCWSTR dllPath, HMODULE *injectedBase)
     if (pRemoteAddress == NULL)
     {
         // MessageBox(NULL, L"DLL 路径写入失败", L"InjectDll", 0);
-        LOG_ERROR("DLL 路径写入失败")
+        LOG_ERROR("DLL 路径写入失败");
         return NULL;
     }
 
@@ -31,7 +31,7 @@ HANDLE InjectDll(DWORD pid, LPCWSTR dllPath, HMODULE *injectedBase)
     if (hThread == NULL)
     {
         // MessageBox(NULL, L"LoadLibrary 调用失败", L"InjectDll", 0);
-        LOG_ERROR("LoadLibrary 调用失败")
+        LOG_ERROR("LoadLibrary 调用失败");
         return NULL;
     }
 
@@ -53,7 +53,7 @@ bool EjectDll(HANDLE process, HMODULE dllBase)
     if (hThread == NULL)
     {
         // MessageBox(NULL, L"FreeLibrary 调用失败!", L"EjectDll", 0);
-        LOG_ERROR("FreeLibrary 调用失败!")
+        LOG_ERROR("FreeLibrary 调用失败!");
         return false;
     }
 
@@ -115,7 +115,7 @@ bool CallDllFuncEx(HANDLE process, LPCWSTR dllPath, HMODULE dllBase, LPCSTR func
     if (pRemoteAddress == NULL)
     {
         // MessageBox(NULL, L"申请内存失败", L"CallDllFuncEx", 0);
-        LOG_ERROR("申请内存失败")
+        LOG_ERROR("申请内存失败");
         return NULL;
     }
 
@@ -126,7 +126,7 @@ bool CallDllFuncEx(HANDLE process, LPCWSTR dllPath, HMODULE dllBase, LPCSTR func
     {
         VirtualFree(pRemoteAddress, 0, MEM_RELEASE);
         // MessageBox(NULL, L"远程调用失败", L"CallDllFuncEx", 0);
-        LOG_ERROR("远程调用失败")
+        LOG_ERROR("远程调用失败");
         return false;
     }
     WaitForSingleObject(hThread, INFINITE);

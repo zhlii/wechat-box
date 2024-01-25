@@ -2,3 +2,6 @@ Debug
 Release
 /hook/.vs
 /hook/Out
+/.vs
+/hook/rpc/tool/proto/__pycache__
+/hook/rpc/proto

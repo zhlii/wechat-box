@@ -7,6 +7,7 @@
 #include "injector.h"
 #include "sdk.h"
 #include "util.h"
+#include "log.h"
 
 #define WCF_LOCK ".wcf.lock"
 
@@ -30,8 +31,8 @@ static int GetDllPath(bool debug, wchar_t *dllPath)
 
     if (!PathFileExists(spyDllPath))
     {
-        // MessageBox(NULL, spyDllPath, L"文件不存在", 0);
-        LOG_ERROR("文件不存在")
+         // MessageBox(NULL, spyDllPath, L"文件不存在", 0);
+        LOG_ERROR("文件不存在");
         return ERROR_FILE_NOT_FOUND;
     }
 
@@ -53,7 +54,7 @@ int WxInitSDK(bool debug, int port)
     if (status != 0)
     {
         // MessageBox(NULL, L"打开微信失败", L"WxInitSDK", 0);
-        LOG_ERROR("打开微信失败")
+        LOG_ERROR("打开微信失败");
         return status;
     }
 
@@ -62,7 +63,7 @@ int WxInitSDK(bool debug, int port)
     if (wcProcess == NULL)
     {
         // MessageBox(NULL, L"注入失败", L"WxInitSDK", 0);
-        LOG_ERROR("注入失败")
+        LOG_ERROR("注入失败");
         return -1;
     }
 
@@ -73,7 +74,7 @@ int WxInitSDK(bool debug, int port)
     if (!CallDllFuncEx(wcProcess, spyDllPath, spyBase, "InitSpy", (LPVOID)&pp, sizeof(PortPath_t), NULL))
     {
         // MessageBox(NULL, L"初始化失败", L"WxInitSDK", 0);
-        LOG_ERROR("初始化失败")
+        LOG_ERROR("初始化失败");
         return -1;
     }
 
@@ -82,7 +83,7 @@ int WxInitSDK(bool debug, int port)
     if (fd == NULL)
     {
         // MessageBox(NULL, L"无法打开lock文件", L"WxInitSDK", 0);
-        LOG_ERROR("无法打开lock文件")
+        LOG_ERROR("无法打开lock文件");
         return -2;
     }
     fwrite((uint8_t *)&debug, sizeof(debug), 1, fd);
@@ -102,7 +103,7 @@ int WxDestroySDK()
     if (pid == 0)
     {
         // MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
-        LOG_ERROR("微信未运行")
+        LOG_ERROR("微信未运行");
         return status;
     }
 
@@ -110,7 +111,7 @@ int WxDestroySDK()
     if (wcProcess == NULL)
     {
         // MessageBox(NULL, L"微信未运行", L"WxDestroySDK", 0);
-        LOG_ERROR("微信未运行")
+        LOG_ERROR("微信未运行");
         return -1;
     }
 
@@ -118,7 +119,7 @@ int WxDestroySDK()
     if (fd == NULL)
     {
         // MessageBox(NULL, L"无法打开lock文件", L"WxDestroySDK", 0);
-        LOG_ERROR("无法打开lock文件")
+        LOG_ERROR("无法打开lock文件");
         return -2;
     }
     fread((uint8_t *)&debug, sizeof(debug), 1, fd);
