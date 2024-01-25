@@ -31,7 +31,7 @@ static int GetDllPath(bool debug, wchar_t *dllPath)
 
     if (!PathFileExists(spyDllPath))
     {
-         // MessageBox(NULL, spyDllPath, L"文件不存在", 0);
+        // MessageBox(NULL, spyDllPath, L"文件不存在", 0);
         LOG_ERROR("文件不存在");
         return ERROR_FILE_NOT_FOUND;
     }
@@ -91,6 +91,15 @@ int WxInitSDK(bool debug, int port)
     fclose(fd);
 #endif
     debugMode = debug;
+
+    DWORD wechat_pid = GetWeChatPid();
+    while (wechat_pid)
+    {
+        Sleep(5000);
+
+        wechat_pid = GetWeChatPid();
+    }
+
     return 0;
 }
 
