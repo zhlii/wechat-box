@@ -79,16 +79,15 @@ int WxInitSDK(bool debug, int port)
     }
 
 #ifdef WCF
-    FILE *fd = fopen(WCF_LOCK, "wb");
-    if (fd == NULL)
-    {
-        // MessageBox(NULL, L"无法打开lock文件", L"WxInitSDK", 0);
+    FILE* fd;// = fopen(WCF_LOCK, "wb");
+    if (fopen_s(&fd, WCF_LOCK, "wb") == 0) {
+        fwrite((uint8_t*)&debug, sizeof(debug), 1, fd);
+        fwrite((uint8_t*)&spyBase, sizeof(spyBase), 1, fd);
+        fclose(fd);
+    } else {
         LOG_ERROR("无法打开lock文件");
         return -2;
-    }
-    fwrite((uint8_t *)&debug, sizeof(debug), 1, fd);
-    fwrite((uint8_t *)&spyBase, sizeof(spyBase), 1, fd);
-    fclose(fd);
+    }  
 #endif
     debugMode = debug;
 
@@ -124,16 +123,17 @@ int WxDestroySDK()
         return -1;
     }
 
-    FILE *fd = fopen(WCF_LOCK, "rb");
-    if (fd == NULL)
-    {
-        // MessageBox(NULL, L"无法打开lock文件", L"WxDestroySDK", 0);
+
+    FILE* fd;
+    if (fopen_s(&fd, WCF_LOCK, "rb") == 0) {
+        fread((uint8_t*)&debug, sizeof(debug), 1, fd);
+        fread((uint8_t*)&spyBase, sizeof(spyBase), 1, fd);
+        fclose(fd);
+    }else{
         LOG_ERROR("无法打开lock文件");
         return -2;
     }
-    fread((uint8_t *)&debug, sizeof(debug), 1, fd);
-    fread((uint8_t *)&spyBase, sizeof(spyBase), 1, fd);
-    fclose(fd);
+    
     status = GetDllPath(debug, spyDllPath);
 #else
     status = GetDllPath(debugMode, spyDllPath);
