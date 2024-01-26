@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 
     if ((argc < 2) || (argc > 4)) {
         help();
+        return 0;
     } else if (argc == 4) {
         debug = (strcmp(argv[3], "debug") == 0);
     }
