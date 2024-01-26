@@ -1,6 +1,8 @@
 # webchat box
-将微信在容器中运行，并通过hook的方式暴露出API
+将微信在容器中运行，并通过hook的方式暴露出rpc接口
 
+## vcpkg
+```
 git clone https://github.com/microsoft/vcpkg
 .\vcpkg\bootstrap-vcpkg.bat
 
@@ -9,3 +11,10 @@ vcpkg install spdlog:x86-windows-static
 vcpkg install nng:x86-windows-static
 vcpkg install magic-enum:x86-windows-static
 vcpkg integrate install
+```
+
+## protobuf
+```
+cd hook\rpc\proto
+..\tool\protoc --nanopb_out=. wcf.proto
+```
