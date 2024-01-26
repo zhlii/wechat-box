@@ -29,19 +29,22 @@ static string get_key(uint8_t header1, uint8_t header2, uint8_t *key)
 {
     // PNG?
     *key = HEADER_PNG1 ^ header1;
-    if ((HEADER_PNG2 ^ *key) == header2) {
+    if ((HEADER_PNG2 ^ *key) == header2)
+    {
         return ".png";
     }
 
     // JPG?
     *key = HEADER_JPG1 ^ header1;
-    if ((HEADER_JPG2 ^ *key) == header2) {
+    if ((HEADER_JPG2 ^ *key) == header2)
+    {
         return ".jpg";
     }
 
     // GIF?
     *key = HEADER_GIF1 ^ header1;
-    if ((HEADER_GIF2 ^ *key) == header2) {
+    if ((HEADER_GIF2 ^ *key) == header2)
+    {
         return ".gif";
     }
 
@@ -50,18 +53,21 @@ static string get_key(uint8_t header1, uint8_t header2, uint8_t *key)
 
 string DecryptImage(string src, string dir)
 {
-    if (!fs::exists(src)) {
+    if (!fs::exists(src))
+    {
+        LOG_ERROR("file not exist {}", src);
         return "";
     }
 
     ifstream in(src.c_str(), ios::binary);
-    if (!in.is_open()) {
+    if (!in.is_open())
+    {
         LOG_ERROR("Failed to read file {}", src);
         return "";
     }
 
     filebuf *pfb = in.rdbuf();
-    size_t size  = pfb->pubseekoff(0, ios::end, ios::in);
+    size_t size = pfb->pubseekoff(0, ios::end, ios::in);
     pfb->pubseekpos(0, ios::in);
 
     vector<char> buff;
@@ -71,36 +77,47 @@ string DecryptImage(string src, string dir)
     in.close();
 
     uint8_t key = 0x00;
-    string ext  = get_key(pBuf[0], pBuf[1], &key);
-    if (ext.empty()) {
+    string ext = get_key(pBuf[0], pBuf[1], &key);
+    if (ext.empty())
+    {
         LOG_ERROR("Failed to get key.");
         return "";
     }
 
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++)
+    {
         pBuf[i] ^= key;
     }
 
     string dst = "";
 
-    try {
-        if (dir.empty()) {
+    try
+    {
+        if (dir.empty())
+        {
             dst = fs::path(src).replace_extension(ext).string();
-        } else {
+        }
+        else
+        {
             dst = (dir.back() == '\\' || dir.back() == '/') ? dir : (dir + "/");
             dst += fs::path(src).stem().string() + ext;
         }
 
         replace(dst.begin(), dst.end(), '\\', '/');
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         LOG_ERROR(GB2312ToUtf8(e.what()));
-    } catch (...) {
+    }
+    catch (...)
+    {
         LOG_ERROR("Unknow exception.");
         return "";
     }
 
     ofstream out(dst.c_str(), ios::binary);
-    if (!out.is_open()) {
+    if (!out.is_open())
+    {
         LOG_ERROR("Failed to write file {}", dst);
         return "";
     }
@@ -113,11 +130,11 @@ string DecryptImage(string src, string dir)
 
 static int GetFirstPage()
 {
-    int rv         = -1;
+    int rv = -1;
     DWORD pyqCall1 = g_WeChatWinDllAddr + g_WxCalls.pyq.call1;
     DWORD pyqCall2 = g_WeChatWinDllAddr + g_WxCalls.pyq.call2;
 
-    char buf[0xB44] = { 0 };
+    char buf[0xB44] = {0};
     __asm {
         pushad;
         call pyqCall1;
@@ -135,11 +152,11 @@ static int GetFirstPage()
 
 static int GetNextPage(uint64_t id)
 {
-    int rv         = -1;
+    int rv = -1;
     DWORD pyqCall1 = g_WeChatWinDllAddr + g_WxCalls.pyq.call1;
     DWORD pyqCall3 = g_WeChatWinDllAddr + g_WxCalls.pyq.call3;
 
-    RawVector_t tmp = { 0 };
+    RawVector_t tmp = {0};
 
     __asm {
         pushad;
@@ -161,12 +178,14 @@ static int GetNextPage(uint64_t id)
 
 int RefreshPyq(uint64_t id)
 {
-    if (!gIsListeningPyq) {
+    if (!gIsListeningPyq)
+    {
         LOG_ERROR("没有启动朋友圈消息接收，参考：enable_receiving_msg");
         return -1;
     }
 
-    if (id == 0) {
+    if (id == 0)
+    {
         return GetFirstPage();
     }
 
@@ -179,22 +198,24 @@ int DownloadAttach(uint64_t id, string thumb, string extra)
     uint64_t localId;
     uint32_t dbIdx;
 
-    if (fs::exists(extra)) { // 第一道，不重复下载
+    if (fs::exists(extra))
+    { // 第一道，不重复下载
         return 0;
     }
 
-    if (GetLocalIdandDbidx(id, &localId, &dbIdx) != 0) {
+    if (GetLocalIdandDbidx(id, &localId, &dbIdx) != 0)
+    {
         LOG_ERROR("Failed to get localId, Please check id: {}", to_string(id));
         return status;
     }
 
-    char buff[0x2D8] = { 0 };
-    DWORD dlCall1    = g_WeChatWinDllAddr + g_WxCalls.da.call1;
-    DWORD dlCall2    = g_WeChatWinDllAddr + g_WxCalls.da.call2;
-    DWORD dlCall3    = g_WeChatWinDllAddr + g_WxCalls.da.call3;
-    DWORD dlCall4    = g_WeChatWinDllAddr + g_WxCalls.da.call4;
-    DWORD dlCall5    = g_WeChatWinDllAddr + g_WxCalls.da.call5;
-    DWORD dlCall6    = g_WeChatWinDllAddr + g_WxCalls.da.call6;
+    char buff[0x2D8] = {0};
+    DWORD dlCall1 = g_WeChatWinDllAddr + g_WxCalls.da.call1;
+    DWORD dlCall2 = g_WeChatWinDllAddr + g_WxCalls.da.call2;
+    DWORD dlCall3 = g_WeChatWinDllAddr + g_WxCalls.da.call3;
+    DWORD dlCall4 = g_WeChatWinDllAddr + g_WxCalls.da.call4;
+    DWORD dlCall5 = g_WeChatWinDllAddr + g_WxCalls.da.call5;
+    DWORD dlCall6 = g_WeChatWinDllAddr + g_WxCalls.da.call6;
 
     __asm {
         pushad;
@@ -213,29 +234,34 @@ int DownloadAttach(uint64_t id, string thumb, string extra)
 
     DWORD type = GET_DWORD(buff + 0x38);
 
-    string save_path  = "";
+    string save_path = "";
     string thumb_path = "";
 
-    switch (type) {
-        case 0x03: { // Image: extra
-            save_path = extra;
-            break;
-        }
-        case 0x3E:
-        case 0x2B: { // Video: thumb
-            thumb_path = thumb;
-            save_path  = fs::path(thumb).replace_extension("mp4").string();
-            break;
-        }
-        case 0x31: { // File: extra
-            save_path = extra;
-            break;
-        }
-        default:
-            break;
+    switch (type)
+    {
+    case 0x03:
+    { // Image: extra
+        save_path = extra;
+        break;
+    }
+    case 0x3E:
+    case 0x2B:
+    { // Video: thumb
+        thumb_path = thumb;
+        save_path = fs::path(thumb).replace_extension("mp4").string();
+        break;
+    }
+    case 0x31:
+    { // File: extra
+        save_path = extra;
+        break;
+    }
+    default:
+        break;
     }
 
-    if (fs::exists(save_path)) { // 不重复下载
+    if (fs::exists(save_path))
+    { // 不重复下载
         return 0;
     }
 
@@ -243,7 +269,7 @@ int DownloadAttach(uint64_t id, string thumb, string extra)
     // 创建父目录，由于路径来源于微信，不做检查
     fs::create_directory(fs::path(save_path).parent_path().string());
 
-    wstring wsSavePath  = String2Wstring(save_path);
+    wstring wsSavePath = String2Wstring(save_path);
     wstring wsThumbPath = String2Wstring(thumb_path);
 
     WxString wxSavePath(wsSavePath);
@@ -280,12 +306,13 @@ int RevokeMsg(uint64_t id)
     int status = -1;
     uint64_t localId;
     uint32_t dbIdx;
-    if (GetLocalIdandDbidx(id, &localId, &dbIdx) != 0) {
+    if (GetLocalIdandDbidx(id, &localId, &dbIdx) != 0)
+    {
         LOG_ERROR("Failed to get localId, Please check id: {}", to_string(id));
         return status;
     }
 
-    char chat_msg[0x2D8] = { 0 };
+    char chat_msg[0x2D8] = {0};
 
     DWORD rmCall1 = g_WeChatWinDllAddr + g_WxCalls.rm.call1;
     DWORD rmCall2 = g_WeChatWinDllAddr + g_WxCalls.rm.call2;
@@ -325,12 +352,14 @@ string GetAudio(uint64_t id, string dir)
     string mp3path = (dir.back() == '\\' || dir.back() == '/') ? dir : (dir + "/");
     mp3path += to_string(id) + ".mp3";
     replace(mp3path.begin(), mp3path.end(), '\\', '/');
-    if (fs::exists(mp3path)) { // 不重复下载
+    if (fs::exists(mp3path))
+    { // 不重复下载
         return mp3path;
     }
 
     vector<uint8_t> silk = GetAudioData(id);
-    if (silk.size() == 0) {
+    if (silk.size() == 0)
+    {
         LOG_ERROR("Empty audio data.");
         return "";
     }
@@ -342,9 +371,10 @@ string GetAudio(uint64_t id, string dir)
 
 OcrResult_t GetOcrResult(string path)
 {
-    OcrResult_t ret = { -1, "" };
+    OcrResult_t ret = {-1, ""};
 
-    if (!fs::exists(path)) {
+    if (!fs::exists(path))
+    {
         LOG_ERROR("Can not find: {}", path);
         return ret;
     }
@@ -360,7 +390,7 @@ OcrResult_t GetOcrResult(string path)
     DWORD ocrCall2 = g_WeChatWinDllAddr + g_WxCalls.ocr.call2;
     DWORD ocrCall3 = g_WeChatWinDllAddr + g_WxCalls.ocr.call3;
 
-    DWORD tmp  = 0;
+    DWORD tmp = 0;
     int status = -1;
     __asm {
         pushad;
@@ -392,14 +422,16 @@ OcrResult_t GetOcrResult(string path)
 
     ret.status = status;
 
-    DWORD addr   = (DWORD)&ocrBuffer;
+    DWORD addr = (DWORD)&ocrBuffer;
     DWORD header = GET_DWORD(addr);
-    DWORD num    = GET_DWORD(addr + 0x4);
-    if (num <= 0) {
+    DWORD num = GET_DWORD(addr + 0x4);
+    if (num <= 0)
+    {
         return ret; // 识别内容为空
     }
 
-    for (uint32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++)
+    {
         DWORD content = GET_DWORD(header);
         ret.result += Wstring2String(GET_WSTRING(content + 0x14));
         ret.result += "\n";

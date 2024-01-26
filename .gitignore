@@ -5,3 +5,4 @@ Release
 /.vs
 /hook/rpc/tool/proto/__pycache__
 /hook/rpc/proto
+.vscode
