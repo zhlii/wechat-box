@@ -6,4 +6,4 @@ Release
 /hook/rpc/tool/proto/__pycache__
 /hook/rpc/proto
 .vscode
-rest.exe
+rest/rest.exe

@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine as go-builder
+FROM golang:1.20.13-alpine3.19 as go-builder
 
 WORKDIR /tmp/rest
 
