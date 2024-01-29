@@ -91,14 +91,6 @@ int WxInitSDK(bool debug, int port)
 #endif
     debugMode = debug;
 
-    DWORD wechat_pid = GetWeChatPid();
-    while (wechat_pid)
-    {
-        Sleep(5000);
-
-        wechat_pid = GetWeChatPid();
-    }
-
     return 0;
 }
 
