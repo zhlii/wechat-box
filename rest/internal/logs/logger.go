@@ -19,10 +19,10 @@ func createLogger() *zap.Logger {
 		Encoding:          "json",
 		EncoderConfig:     encoderCfg,
 		OutputPaths: []string{
-			"log_file.log",
+			"rest.log",
 		},
 		ErrorOutputPaths: []string{
-			"log_file.log",
+			"rest.log",
 		},
 		InitialFields: map[string]interface{}{},
 	}
