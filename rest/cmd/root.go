@@ -36,27 +36,31 @@ var rootCmd = &cobra.Command{
 
 		defer boot.DestorySDK()
 
-		client := rpc.NewClient(config.Data.Rpc.Host, config.Data.Rpc.Port)
+		if config.Data.Rpc.Enable {
+			client := rpc.NewClient(config.Data.Rpc.Host, config.Data.Rpc.Port)
 
-		err = client.Connect()
-		if err != nil {
-			logs.Fatal(fmt.Sprintf("connect wx rpc client failed. err:%v", err))
+			err = client.Connect()
+			if err != nil {
+				logs.Fatal(fmt.Sprintf("connect wx rpc client failed. err:%v", err))
+			}
+			defer client.Close()
+
+			for _, h := range callback.Setup() {
+				err = client.RegisterCallback(func(msg *rpc.WxMsg) {
+					h.Callback(client, msg)
+				})
+			}
+
+			if err != nil {
+				logs.Fatal(fmt.Sprintf("register wx rpc callback failed. err:%v", err))
+			}
+
+			if config.Data.Httpd.Enable {
+				httpd := httpd.NewHttpServer(client)
+				httpd.Start()
+				defer httpd.Close()
+			}
 		}
-		defer client.Close()
-
-		for _, h := range callback.Setup() {
-			err = client.RegisterCallback(func(msg *rpc.WxMsg) {
-				h.Callback(client, msg)
-			})
-		}
-
-		if err != nil {
-			logs.Fatal(fmt.Sprintf("register wx rpc callback failed. err:%v", err))
-		}
-
-		httpd := httpd.NewHttpServer(client)
-		httpd.Start()
-		defer httpd.Close()
 
 		// 等待服务器停止信号
 		chSig := make(chan os.Signal)

@@ -4,7 +4,9 @@ common:
 
 httpd:
   addr: 0.0.0.0:80
+  enable: true
 
 rpc:
   host: localhost
   port: 8888
+  enable: true

@@ -14,12 +14,14 @@ type Config struct {
 	}
 
 	Httpd struct {
-		Addr string
+		Addr   string
+		Enable bool
 	}
 
 	Rpc struct {
-		Host string
-		Port int
+		Host   string
+		Port   int
+		Enable bool
 	}
 }
 
