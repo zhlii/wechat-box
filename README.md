@@ -21,10 +21,16 @@ cd hook\rpc\proto
 ..\tool\protoc --nanopb_out=. wcf.proto
 ```
 
-# rest目录
+# 生成protobuffer代码
 ```
 cd rest/internal/rpc
 
 protoc --go_out=. rpc.proto
 ```
 
+## 本地测试
+```
+cd /rest
+cp config.yaml config.local.yaml
+go build && ./rest --config=config.local.yaml
+```
