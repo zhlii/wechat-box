@@ -399,34 +399,12 @@ func (c *CmdClient) GetOcrResultTimeout(extra string, timeout int) (string, erro
 	return "", errors.New("timeout")
 }
 
-// 下载图片
-// param msgid uint64 消息 id
-// param extra string 消息中的 extra
-// param dir string 存放图片的目录（目录不存在会出错）
-// param timeout int 超时重试次数（每次重试间隔1秒）
-// return string 成功返回存储路径
-func (c *CmdClient) DownloadImage(msgid uint64, extra, dir string, timeout int) (string, error) {
-	if c.DownloadAttach(msgid, "", extra) != 0 {
-		return "", errors.New("failed to download attach")
-	}
-	cnt := 0
-	for cnt <= timeout {
-		if path := c.DecryptImage(extra, dir); path != "" {
-			return path, nil
-		}
-		time.Sleep(1 * time.Second)
-		cnt++
-	}
-	// 超时
-	return "", errors.New("timeout")
-}
-
 // 下载附件
 // param msgid string 消息 id
 // param thumb string 消息中的 thumb
 // param extra string 消息中的 extra
 // return int32 0 为成功，其他失败
-func (c *CmdClient) DownloadAttach(msgid uint64, thumb, extra string) int32 {
+func (c *CmdClient) DownloadAttach(msgid uint64, thumb, extra string) (int32, error) {
 	req := &Request{Func: Functions_FUNC_DOWNLOAD_ATTACH}
 	req.Msg = &Request_Att{
 		Att: &AttachMsg{
@@ -435,8 +413,11 @@ func (c *CmdClient) DownloadAttach(msgid uint64, thumb, extra string) int32 {
 			Extra: extra,
 		},
 	}
-	resp, _ := c.socket.call(req)
-	return resp.GetStatus()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return 0, err
+	}
+	return resp.GetStatus(), nil
 }
 
 // 解密图片
@@ -444,7 +425,7 @@ func (c *CmdClient) DownloadAttach(msgid uint64, thumb, extra string) int32 {
 // param src string 加密的图片路径
 // param dir string 保存图片的目录
 // return str 解密图片的保存路径
-func (c *CmdClient) DecryptImage(src, dir string) string {
+func (c *CmdClient) DecryptImage(src, dir string) (string, error) {
 	req := &Request{Func: Functions_FUNC_DECRYPT_IMAGE}
 	req.Msg = &Request_Dec{
 		Dec: &DecPath{
@@ -452,8 +433,11 @@ func (c *CmdClient) DecryptImage(src, dir string) string {
 			Dst: dir,
 		},
 	}
-	resp, _ := c.socket.call(req)
-	return resp.GetStr()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return "", err
+	}
+	return resp.GetStr(), nil
 }
 
 // 获取完整通讯录
@@ -512,7 +496,7 @@ func (c *CmdClient) RefreshPyq(id uint64) int32 {
 // param v4 string Ticket (好友申请消息里 v4 开头的字符串)
 // param scene int32 申请方式 (好友申请消息里的 scene); 为了兼容旧接口，默认为扫码添加 (30)
 // return int32 1 为成功，其他失败
-func (c *CmdClient) AcceptNewFriend(v3, v4 string, scene int32) int32 {
+func (c *CmdClient) AcceptNewFriend(v3, v4 string, scene int32) (int32, error) {
 	req := &Request{Func: Functions_FUNC_ACCEPT_FRIEND}
 	req.Msg = &Request_V{
 		V: &Verification{
@@ -521,8 +505,11 @@ func (c *CmdClient) AcceptNewFriend(v3, v4 string, scene int32) int32 {
 			Scene: scene,
 		},
 	}
-	resp, _ := c.socket.call(req)
-	return resp.GetStatus()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return 0, err
+	}
+	return resp.GetStatus(), nil
 }
 
 // 接收好友转账
