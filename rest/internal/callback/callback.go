@@ -9,6 +9,7 @@ type Handler struct {
 var handlers = make(map[string]*Handler)
 
 func Setup() []*Handler {
+	handlerLog()
 	handlerEcho()
 	handlerAutoAcceptFriendInvite()
 	handlerDownloadFile()

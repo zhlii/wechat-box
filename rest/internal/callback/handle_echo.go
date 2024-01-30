@@ -7,7 +7,7 @@ func handlerEcho() {
 		Callback: func(c *rpc.Client, msg *rpc.WxMsg) {
 			switch msg.Type {
 			case 1:
-				if rpc.ContactType(msg.Sender) == "文件传输助手" {
+				if msg.IsSelf && rpc.ContactType(msg.Receiver) == "文件传输助手" {
 					c.CmdClient.SendTxt(msg.Content, msg.Sender, "")
 				}
 			}
