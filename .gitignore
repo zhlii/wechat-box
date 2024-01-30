@@ -7,3 +7,5 @@ Release
 /hook/rpc/proto
 .vscode
 rest/rest.exe
+rest/rest.log
+rest/rest

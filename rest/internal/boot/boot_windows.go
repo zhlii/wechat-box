@@ -1,3 +1,6 @@
+//go:build windows
+// +build windows
+
 package boot
 
 import (
@@ -39,8 +42,6 @@ func (b *Boot) DestorySDK() error {
 	if err != nil {
 		return err
 	}
-
-	os.RemoveAll(filepath.Dir(b.SdkFilePath))
 
 	return nil
 }

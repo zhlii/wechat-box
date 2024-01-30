@@ -1,5 +1,7 @@
 # webchat box
-将微信在容器中运行，并通过hook的方式暴露出rpc接口
+将微信在容器中运行，暴露出HTTP REST接口
+
+# hook目录
 
 ## vcpkg
 ```
@@ -18,3 +20,11 @@ vcpkg integrate install
 cd hook\rpc\proto
 ..\tool\protoc --nanopb_out=. wcf.proto
 ```
+
+# rest目录
+```
+cd rest/internal/rpc
+
+protoc --go_out=. rpc.proto
+```
+

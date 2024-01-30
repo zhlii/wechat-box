@@ -4,7 +4,7 @@ WORKDIR /tmp/rest
 
 COPY ./rest .
 
-RUN GO111MODULE=on CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o rest.exe
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o rest.exe
 
 
 # https://github.com/zhlii/wine-box
