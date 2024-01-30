@@ -571,31 +571,6 @@ type GetOcrRequest struct {
 	Timeout int `json:"timeout"`
 }
 
-// @Summary 下载图片
-// @Produce json
-// @Param body body DownloadImageRequest true "下载图片参数"
-// @Success 200 {object} CommonPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /download_image [post]
-func (wc *Controller) downloadImage(c *gin.Context) {
-
-	var req DownloadImageRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Set("Error", err)
-		return
-	}
-
-	resp, err := wc.CmdClient.DownloadImage(req.Msgid, req.Extra, req.Dir, req.Timeout)
-
-	c.Set("Data", CommonPayload{
-		Success: resp != "",
-		Result:  resp,
-		Error:   err,
-	})
-
-}
-
 type DownloadImageRequest struct {
 	// 消息 id
 	Msgid uint64 `json:"msgid"`
@@ -605,29 +580,6 @@ type DownloadImageRequest struct {
 	Dir string `json:"dir"`
 	// 超时重试次数
 	Timeout int `json:"timeout"`
-}
-
-// @Summary 下载附件
-// @Produce json
-// @Param body body DownloadAttachRequest true "下载附件参数"
-// @Success 200 {object} CommonPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /download_attach [post]
-func (wc *Controller) downloadAttach(c *gin.Context) {
-
-	var req DownloadAttachRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Set("Error", err)
-		return
-	}
-
-	status := wc.CmdClient.DownloadAttach(req.Msgid, req.Thumb, req.Extra)
-
-	c.Set("Data", CommonPayload{
-		Success: status == 0,
-	})
-
 }
 
 type DownloadAttachRequest struct {
@@ -781,29 +733,6 @@ func (wc *Controller) refreshPyq(c *gin.Context) {
 type RefreshPyqRequest struct {
 	// 分页 id
 	Id uint64 `json:"id"`
-}
-
-// @Summary 接受好友请求
-// @Produce json
-// @Param body body AcceptNewFriendRequest true "接受好友参数"
-// @Success 200 {object} CommonPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /accept_new_friend [post]
-func (wc *Controller) acceptNewFriend(c *gin.Context) {
-
-	var req AcceptNewFriendRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.Set("Error", err)
-		return
-	}
-
-	status := wc.CmdClient.AcceptNewFriend(req.V3, req.V4, req.Scene)
-
-	c.Set("Data", CommonPayload{
-		Success: status == 1,
-	})
-
 }
 
 type AcceptNewFriendRequest struct {

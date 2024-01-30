@@ -34,14 +34,11 @@ func Route(client *rpc.Client, rg *gin.RouterGroup) {
 	rg.POST("send_pat_msg", ctrl.sendPatMsg)
 	rg.GET("audio_msg", ctrl.getAudioMsg)
 	rg.GET("ocr_result", ctrl.getOcrResult)
-	rg.POST("download_image", ctrl.downloadImage)
-	rg.POST("download_attach", ctrl.downloadAttach)
 
 	rg.GET("avatars", ctrl.getAvatars)
 	rg.GET("contacts", ctrl.getContacts)
 	rg.GET("friends", ctrl.getFriends)
 	rg.GET("user_info", ctrl.getInfoByWxid)
 	rg.POST("refresh_pyq", ctrl.refreshPyq)
-	rg.POST("accept_new_friend", ctrl.acceptNewFriend)
 	rg.POST("receive_transfer", ctrl.receiveTransfer)
 }
