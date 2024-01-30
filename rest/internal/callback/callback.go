@@ -10,6 +10,8 @@ var handlers = make(map[string]*Handler)
 
 func Setup() []*Handler {
 	handlerEcho()
+	handlerAutoAcceptFriendInvite()
+	handlerDownloadFile()
 
 	list := make([]*Handler, 0)
 
