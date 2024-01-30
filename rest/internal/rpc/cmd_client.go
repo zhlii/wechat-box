@@ -23,7 +23,7 @@ func (c *CmdClient) Close() error {
 // return bool 是否已登录
 func (c *CmdClient) IsLogin() bool {
 	req := &Request{Func: Functions_FUNC_IS_LOGIN}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus() == 1
 }
 
@@ -31,7 +31,7 @@ func (c *CmdClient) IsLogin() bool {
 // return string 登录账号wxid
 func (c *CmdClient) GetSelfWxid() string {
 	req := &Request{Func: Functions_FUNC_GET_SELF_WXID}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStr()
 }
 
@@ -39,7 +39,7 @@ func (c *CmdClient) GetSelfWxid() string {
 // return *UserInfo 登录账号个人信息
 func (c *CmdClient) GetSelfInfo() *UserInfo {
 	req := &Request{Func: Functions_FUNC_GET_USER_INFO}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetUi()
 }
 
@@ -47,7 +47,7 @@ func (c *CmdClient) GetSelfInfo() *UserInfo {
 // return map[int32]string 所有消息类型
 func (c *CmdClient) GetMsgTypes() map[int32]string {
 	req := &Request{Func: Functions_FUNC_GET_MSG_TYPES}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetTypes().GetTypes()
 }
 
@@ -55,7 +55,7 @@ func (c *CmdClient) GetMsgTypes() map[int32]string {
 // return []string 所有数据库名
 func (c *CmdClient) GetDbNames() []string {
 	req := &Request{Func: Functions_FUNC_GET_DB_NAMES}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetDbs().Names
 }
 
@@ -67,7 +67,7 @@ func (c *CmdClient) GetDbTables(db string) []*DbTable {
 	req.Msg = &Request_Str{
 		Str: db,
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetTables().GetTables()
 }
 
@@ -83,7 +83,7 @@ func (c *CmdClient) DbSqlQuery(db, sql string) []map[string]any {
 			Sql: sql,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	rows := []map[string]any{}
 	for _, row := range resp.GetRows().GetRows() {
 		fields := map[string]any{}
@@ -119,7 +119,7 @@ func (c *CmdClient) InviteChatroomMembers(roomid, wxids string) int32 {
 			Wxids:  strings.ReplaceAll(wxids, " ", ""),
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -135,7 +135,7 @@ func (c *CmdClient) AddChatRoomMembers(roomid, wxIds string) int32 {
 			Wxids:  wxIds,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -151,7 +151,7 @@ func (c *CmdClient) DelChatRoomMembers(roomid, wxIds string) int32 {
 			Wxids:  wxIds,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -163,7 +163,7 @@ func (c *CmdClient) RevokeMsg(msgid uint64) int32 {
 	req.Msg = &Request_Ui64{
 		Ui64: msgid,
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -179,7 +179,7 @@ func (c *CmdClient) ForwardMsg(msgid uint64, receiver string) int32 {
 			Receiver: receiver,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -197,7 +197,7 @@ func (c *CmdClient) SendTxt(msg, receiver, aters string) int32 {
 			Aters:    aters,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -216,7 +216,7 @@ func (c *CmdClient) SendImg(path, receiver string) int32 {
 			Receiver: receiver,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -235,7 +235,7 @@ func (c *CmdClient) SendFile(path, receiver string) int32 {
 			Receiver: receiver,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -258,7 +258,7 @@ func (c *CmdClient) SendXml(path, content, receiver string, Type int32) int32 {
 			Type:     Type,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -277,7 +277,7 @@ func (c *CmdClient) SendEmotion(path, receiver string) int32 {
 			Receiver: receiver,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -312,7 +312,7 @@ func (c *CmdClient) SendRichText(name, account, title, digest, url, thumburl, re
 			Receiver: receiver,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -328,7 +328,7 @@ func (c *CmdClient) SendPatMsg(roomid, wxid string) int32 {
 			Wxid:   wxid,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -344,7 +344,7 @@ func (c *CmdClient) GetAudioMsg(msgid uint64, dir string) string {
 			Dir: dir,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStr()
 }
 
@@ -376,7 +376,7 @@ func (c *CmdClient) GetOcrResult(extra string) (string, int32) {
 	req.Msg = &Request_Str{
 		Str: extra,
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	ocr := resp.GetOcr()
 	return ocr.GetResult(), ocr.GetStatus()
 }
@@ -435,7 +435,7 @@ func (c *CmdClient) DownloadAttach(msgid uint64, thumb, extra string) int32 {
 			Extra: extra,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -452,7 +452,7 @@ func (c *CmdClient) DecryptImage(src, dir string) string {
 			Dst: dir,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStr()
 }
 
@@ -460,7 +460,7 @@ func (c *CmdClient) DecryptImage(src, dir string) string {
 // return []*RpcContact 完整通讯录
 func (c *CmdClient) GetContacts() []*RpcContact {
 	req := &Request{Func: Functions_FUNC_GET_CONTACTS}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetContacts().GetContacts()
 }
 
@@ -484,7 +484,7 @@ func (c *CmdClient) GetInfoByWxid(wxid string) *RpcContact {
 	req.Msg = &Request_Str{
 		Str: wxid,
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	contacts := resp.GetContacts()
 	if contacts != nil {
 		contacts := contacts.GetContacts()
@@ -503,7 +503,7 @@ func (c *CmdClient) RefreshPyq(id uint64) int32 {
 	req.Msg = &Request_Ui64{
 		Ui64: id,
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -521,7 +521,7 @@ func (c *CmdClient) AcceptNewFriend(v3, v4 string, scene int32) int32 {
 			Scene: scene,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
@@ -539,28 +539,34 @@ func (c *CmdClient) ReceiveTransfer(wxid, tfid, taid string) int32 {
 			Taid: taid,
 		},
 	}
-	resp := c.socket.call(req)
+	resp, _ := c.socket.call(req)
 	return resp.GetStatus()
 }
 
 // 开启消息接收服务
 // param pyq bool 是否接收朋友圈消息
 // return int32 0 为成功，其他失败
-func (c *CmdClient) EnableMsgReciver(pyq bool) int32 {
+func (c *CmdClient) EnableMsgReciver(pyq bool) (int32, error) {
 	req := &Request{Func: Functions_FUNC_ENABLE_RECV_TXT}
 	req.Msg = &Request_Flag{
 		Flag: pyq,
 	}
-	resp := c.socket.call(req)
-	return resp.GetStatus()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return 0, err
+	}
+	return resp.GetStatus(), nil
 }
 
 // 停止消息接收服务
 // return int32 0 为成功，其他失败
-func (c *CmdClient) DisableMsgReciver() int32 {
+func (c *CmdClient) DisableMsgReciver() (int32, error) {
 	logs.Debug("disable msg reciver")
 
 	req := &Request{Func: Functions_FUNC_DISABLE_RECV_TXT}
-	resp := c.socket.call(req)
-	return resp.GetStatus()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return 0, err
+	}
+	return resp.GetStatus(), nil
 }

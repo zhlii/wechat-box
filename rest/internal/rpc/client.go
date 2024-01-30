@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"errors"
+	"fmt"
 	"time"
 )
 
@@ -24,17 +24,17 @@ func NewClient(host string, port int) *Client {
 }
 
 func (c *Client) Connect() error {
-	return c.CmdClient.socket.conn(25)
+	return c.CmdClient.socket.conn(5)
 }
 
 func (c *Client) RegisterCallback(callback MsgCallback) error {
 	if c.MsgClient.callbacks == nil {
-		if c.CmdClient.EnableMsgReciver(true) != 0 {
-			return errors.New("failed to enable msg server")
+		if _, err := c.CmdClient.EnableMsgReciver(true); err != nil {
+			return fmt.Errorf("failed to enable msg server. error: %v", err)
 		}
-	}
 
-	time.Sleep(time.Second)
+		time.Sleep(time.Second)
+	}
 
 	_, err := c.MsgClient.Register(callback)
 
@@ -42,7 +42,7 @@ func (c *Client) RegisterCallback(callback MsgCallback) error {
 }
 
 func (c *Client) Close() {
-	c.MsgClient.close()
+	c.MsgClient.Close()
 
 	c.CmdClient.DisableMsgReciver()
 	c.CmdClient.Close()

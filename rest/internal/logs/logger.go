@@ -18,10 +18,9 @@ func CreateLogger() {
 
 	outputPath := "stdout"
 	errOutputPath := "stderr"
-	fmt.Println(config.Data.Common.IsProd)
 	if config.Data.Common.IsProd {
 		outputPath = "rest.log"
-		errOutputPath = "rest.err.log"
+		errOutputPath = "rest.log"
 	}
 
 	config := zap.Config{

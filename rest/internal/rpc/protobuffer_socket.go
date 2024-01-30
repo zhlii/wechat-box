@@ -47,16 +47,16 @@ func (s *protobufferSocket) conn(timeout uint) (err error) {
 	return s.socket.Dial(s.addr)
 }
 
-func (s *protobufferSocket) call(req *Request) *Response {
+func (s *protobufferSocket) call(req *Request) (*Response, error) {
 	if err := s.send(req); err != nil {
-		logs.Error(err.Error())
-		return &Response{}
+		logs.Error(fmt.Sprintf("protobuffer send req error. req:%v error:%v", req, err))
+		return &Response{}, err
 	}
 	if resp, err := s.recv(); err != nil {
-		logs.Error(err.Error())
-		return &Response{}
+		logs.Error(fmt.Sprintf("protobuffer recv req error. %v", err))
+		return &Response{}, err
 	} else {
-		return resp
+		return resp, nil
 	}
 }
 

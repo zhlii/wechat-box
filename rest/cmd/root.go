@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zhlii/wechat-box/rest/internal/boot"
+	"github.com/zhlii/wechat-box/rest/internal/callback"
 	"github.com/zhlii/wechat-box/rest/internal/config"
 	"github.com/zhlii/wechat-box/rest/internal/httpd"
 	"github.com/zhlii/wechat-box/rest/internal/logs"
@@ -41,11 +42,17 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			logs.Fatal(fmt.Sprintf("connect wx rpc client failed. err:%v", err))
 		}
-
-		client.RegisterCallback(func(msg *rpc.WxMsg) {
-			fmt.Println(msg)
-		})
 		defer client.Close()
+
+		for _, h := range callback.Setup() {
+			err = client.RegisterCallback(func(msg *rpc.WxMsg) {
+				h.Callback(client, msg)
+			})
+		}
+
+		if err != nil {
+			logs.Fatal(fmt.Sprintf("register wx rpc callback failed. err:%v", err))
+		}
 
 		httpd := httpd.NewHttpServer(client)
 		httpd.Start()

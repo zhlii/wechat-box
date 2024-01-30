@@ -1,6 +1,10 @@
 package rpc
 
-import "github.com/zhlii/wechat-box/rest/internal/logs"
+import (
+	"fmt"
+
+	"github.com/zhlii/wechat-box/rest/internal/logs"
+)
 
 type MsgCallback func(msg *WxMsg)
 
@@ -9,7 +13,7 @@ type MsgClient struct {
 	callbacks map[string]MsgCallback
 }
 
-func (c *MsgClient) close(ks ...string) error {
+func (c *MsgClient) Close(ks ...string) error {
 	logs.Debug("close msg client")
 	if len(c.callbacks) > 0 && len(ks) > 0 {
 		for _, k := range ks {
@@ -30,7 +34,7 @@ func (c *MsgClient) close(ks ...string) error {
 func (c *MsgClient) Register(cb MsgCallback) (string, error) {
 	k := Rand(16)
 	if c.callbacks == nil {
-		if err := c.socket.conn(30); err != nil {
+		if err := c.socket.conn(0); err != nil {
 			logs.Error("msg socket conn error")
 			return "", err
 		}
@@ -38,7 +42,6 @@ func (c *MsgClient) Register(cb MsgCallback) (string, error) {
 			k: cb,
 		}
 		go func() {
-			defer c.close()
 			for len(c.callbacks) > 0 {
 				if resp, err := c.socket.recv(); err == nil {
 					msg := resp.GetWxmsg()
@@ -46,11 +49,9 @@ func (c *MsgClient) Register(cb MsgCallback) (string, error) {
 						go f(msg)
 					}
 				} else {
-					logs.Error("msg receiver error")
+					logs.Error(fmt.Sprintf("msg receiver error: %v", err))
 				}
 			}
-
-			logs.Debug("msg receiver stopped")
 		}()
 	} else {
 		c.callbacks[k] = cb
