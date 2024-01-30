@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"errors"
-	"net"
 	"time"
 )
 
@@ -11,22 +10,17 @@ type Client struct {
 	MsgClient *MsgClient
 }
 
-func NewClient(addr string) (*Client, error) {
-	host, port, err := net.SplitHostPort(addr)
-	if err != nil {
-		return nil, err
-	}
-
+func NewClient(host string, port int) *Client {
 	client := &Client{
 		CmdClient: &CmdClient{
-			socket: newProtobufferSocker(host, ToInt(port)),
+			socket: newProtobufferSocker(host, port),
 		},
 		MsgClient: &MsgClient{
-			socket: newProtobufferSocker(host, ToInt(port)+1),
+			socket: newProtobufferSocker(host, port+1),
 		},
 	}
 
-	return client, nil
+	return client
 }
 
 func (c *Client) Connect() error {

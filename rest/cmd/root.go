@@ -8,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zhlii/wechat-box/rest/internal/boot"
+	"github.com/zhlii/wechat-box/rest/internal/config"
+	"github.com/zhlii/wechat-box/rest/internal/httpd"
 	"github.com/zhlii/wechat-box/rest/internal/logs"
 	"github.com/zhlii/wechat-box/rest/internal/rpc"
 )
@@ -17,13 +19,15 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use: "rest",
 	Run: func(cmd *cobra.Command, args []string) {
-		// var cfg = "config.yaml"
-		// if cfgFile != "" {
-		// 	cfg = cfgFile
-		// }
-		// config.Init(cfg)
+		var cfg = "config.yaml"
+		if cfgFile != "" {
+			cfg = cfgFile
+		}
+		config.Init(cfg)
 
-		boot := &boot.Boot{WcfPort: 8888}
+		logs.CreateLogger()
+
+		boot := &boot.Boot{WcfPort: config.Data.Rpc.Port}
 		err := boot.InitSDK()
 		if err != nil {
 			logs.Fatal(fmt.Sprintf("boot wx failed. err:%v", err))
@@ -31,10 +35,8 @@ var rootCmd = &cobra.Command{
 
 		defer boot.DestorySDK()
 
-		client, err := rpc.NewClient("10.1.3.10:8888")
-		if err != nil {
-			logs.Fatal(fmt.Sprintf("create new wx rpc client failed. err:%v", err))
-		}
+		client := rpc.NewClient(config.Data.Rpc.Host, config.Data.Rpc.Port)
+
 		err = client.Connect()
 		if err != nil {
 			logs.Fatal(fmt.Sprintf("connect wx rpc client failed. err:%v", err))
@@ -44,6 +46,10 @@ var rootCmd = &cobra.Command{
 			fmt.Println(msg)
 		})
 		defer client.Close()
+
+		httpd := httpd.NewHttpServer(client)
+		httpd.Start()
+		defer httpd.Close()
 
 		// 等待服务器停止信号
 		chSig := make(chan os.Signal)

@@ -30,8 +30,8 @@ func (c *MsgClient) close(ks ...string) error {
 func (c *MsgClient) Register(cb MsgCallback) (string, error) {
 	k := Rand(16)
 	if c.callbacks == nil {
-		if err := c.socket.conn(0); err != nil {
-			logs.Error("msg receiver error")
+		if err := c.socket.conn(30); err != nil {
+			logs.Error("msg socket conn error")
 			return "", err
 		}
 		c.callbacks = map[string]MsgCallback{

@@ -9,3 +9,5 @@ Release
 rest/rest.exe
 rest/rest.log
 rest/rest
+rest/rest.err.log
+rest/config.local.yaml

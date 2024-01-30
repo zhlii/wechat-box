@@ -1,0 +1,10 @@
+common:
+  log_level: info
+  is_prod: true
+
+httpd:
+  addr: 0.0.0.0:80
+
+rpc:
+  host: localhost
+  port: 8888

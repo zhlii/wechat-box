@@ -1,17 +1,31 @@
 package logs
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/zhlii/wechat-box/rest/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func createLogger() *zap.Logger {
+func CreateLogger() {
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = "ts"
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
+	loglevel, _ := parseLogLevel(config.Data.Common.LogLevel)
+
+	outputPath := "stdout"
+	errOutputPath := "stderr"
+	fmt.Println(config.Data.Common.IsProd)
+	if config.Data.Common.IsProd {
+		outputPath = "rest.log"
+		errOutputPath = "rest.err.log"
+	}
+
 	config := zap.Config{
-		Level:             zap.NewAtomicLevelAt(zap.DebugLevel),
+		Level:             zap.NewAtomicLevelAt(loglevel),
 		Development:       false,
 		DisableCaller:     true,
 		DisableStacktrace: true,
@@ -19,36 +33,54 @@ func createLogger() *zap.Logger {
 		Encoding:          "json",
 		EncoderConfig:     encoderCfg,
 		OutputPaths: []string{
-			"rest.log",
+			outputPath,
 		},
 		ErrorOutputPaths: []string{
-			"rest.log",
+			errOutputPath,
 		},
 		InitialFields: map[string]interface{}{},
 	}
 
-	l, _ := config.Build()
-	return l
+	_logger, _ = config.Build()
 }
 
-var L = createLogger()
+func parseLogLevel(levelStr string) (zapcore.Level, error) {
+	switch strings.ToLower(levelStr) {
+	case "debug":
+		return zap.DebugLevel, nil
+	case "info":
+		return zap.InfoLevel, nil
+	case "warn", "warning":
+		return zap.WarnLevel, nil
+	case "error":
+		return zap.ErrorLevel, nil
+	case "fatal":
+		return zap.FatalLevel, nil
+	case "panic":
+		return zap.PanicLevel, nil
+	default:
+		return zap.InfoLevel, fmt.Errorf("unknown log level: %s, use default level info", levelStr)
+	}
+}
+
+var _logger *zap.Logger
 
 // Debug logs an debug msg with fields
 func Debug(msg string, fields ...zapcore.Field) {
-	L.Debug(msg, fields...)
+	_logger.Debug(msg, fields...)
 }
 
 // Info logs an info msg with fields
 func Info(msg string, fields ...zapcore.Field) {
-	L.Info(msg, fields...)
+	_logger.Info(msg, fields...)
 }
 
 // Error logs an error msg with fields
 func Error(msg string, fields ...zapcore.Field) {
-	L.Error(msg, fields...)
+	_logger.Error(msg, fields...)
 }
 
 // Fatal logs a fatal error msg with fields
 func Fatal(msg string, fields ...zapcore.Field) {
-	L.Fatal(msg, fields...)
+	_logger.Fatal(msg, fields...)
 }
