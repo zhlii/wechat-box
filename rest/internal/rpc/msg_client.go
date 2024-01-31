@@ -32,14 +32,14 @@ func (c *MsgClient) Close(ks ...string) error {
 // param cb MsgCallback 消息回调函数
 // return string 接收器唯一标识
 func (c *MsgClient) Register(cb MsgCallback) (string, error) {
-	k := Rand(16)
+	key := Rand(16)
 	if c.callbacks == nil {
 		if err := c.socket.conn(0); err != nil {
 			logs.Error("msg socket conn error")
 			return "", err
 		}
 		c.callbacks = map[string]MsgCallback{
-			k: cb,
+			key: cb,
 		}
 		go func() {
 			for len(c.callbacks) > 0 {
@@ -49,12 +49,12 @@ func (c *MsgClient) Register(cb MsgCallback) (string, error) {
 						go f(msg)
 					}
 				} else {
-					logs.Error(fmt.Sprintf("msg receiver error: %v", err))
+					logs.Warn(fmt.Sprintf("msg receiver error: %v", err))
 				}
 			}
 		}()
 	} else {
-		c.callbacks[k] = cb
+		c.callbacks[key] = cb
 	}
-	return k, nil
+	return key, nil
 }

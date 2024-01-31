@@ -74,6 +74,10 @@ func Info(msg string, fields ...zapcore.Field) {
 	_logger.Info(msg, fields...)
 }
 
+func Warn(msg string, fields ...zapcore.Field) {
+	_logger.Warn(msg, fields...)
+}
+
 // Error logs an error msg with fields
 func Error(msg string, fields ...zapcore.Field) {
 	_logger.Error(msg, fields...)

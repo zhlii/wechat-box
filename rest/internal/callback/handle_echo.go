@@ -1,6 +1,8 @@
 package callback
 
-import "github.com/zhlii/wechat-box/rest/internal/rpc"
+import (
+	"github.com/zhlii/wechat-box/rest/internal/rpc"
+)
 
 func handlerEcho() {
 	handlers["echo"] = &Handler{
@@ -8,7 +10,7 @@ func handlerEcho() {
 			switch msg.Type {
 			case 1:
 				if msg.IsSelf && rpc.ContactType(msg.Receiver) == "文件传输助手" {
-					c.CmdClient.SendTxt(msg.Content, msg.Sender, "")
+					c.CmdClient.SendTxt(msg.Content, msg.Receiver, "")
 				}
 			}
 		},

@@ -46,13 +46,14 @@ var rootCmd = &cobra.Command{
 			defer client.Close()
 
 			for _, h := range callback.Setup() {
+				handler := h
 				err = client.RegisterCallback(func(msg *rpc.WxMsg) {
-					h.Callback(client, msg)
+					handler.Callback(client, msg)
 				})
-			}
 
-			if err != nil {
-				logs.Fatal(fmt.Sprintf("register wx rpc callback failed. err:%v", err))
+				if err != nil {
+					logs.Warn(fmt.Sprintf("register callback error:%v", err))
+				}
 			}
 
 			if config.Data.Httpd.Enable {
