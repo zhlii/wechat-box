@@ -23,6 +23,8 @@ type Config struct {
 		Port   int
 		Enable bool
 	}
+
+	Callbacks map[string]map[string]string
 }
 
 var Data *Config

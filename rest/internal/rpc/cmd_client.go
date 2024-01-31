@@ -21,10 +21,13 @@ func (c *CmdClient) Close() error {
 
 // 检查登录状态
 // return bool 是否已登录
-func (c *CmdClient) IsLogin() bool {
+func (c *CmdClient) IsLogin() (bool, error) {
 	req := &Request{Func: Functions_FUNC_IS_LOGIN}
-	resp, _ := c.socket.call(req)
-	return resp.GetStatus() == 1
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return false, err
+	}
+	return resp.GetStatus() == 1, nil
 }
 
 // 获取登录账号wxid
@@ -37,10 +40,13 @@ func (c *CmdClient) GetSelfWxid() string {
 
 // 获取登录账号个人信息
 // return *UserInfo 登录账号个人信息
-func (c *CmdClient) GetSelfInfo() *UserInfo {
+func (c *CmdClient) GetSelfInfo() (*UserInfo, error) {
 	req := &Request{Func: Functions_FUNC_GET_USER_INFO}
-	resp, _ := c.socket.call(req)
-	return resp.GetUi()
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.GetUi(), nil
 }
 
 // 获取所有消息类型

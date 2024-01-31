@@ -1,6 +1,9 @@
 package callback
 
-import "github.com/zhlii/wechat-box/rest/internal/rpc"
+import (
+	"github.com/zhlii/wechat-box/rest/internal/config"
+	"github.com/zhlii/wechat-box/rest/internal/rpc"
+)
 
 type Handler struct {
 	Callback func(c *rpc.Client, msg *rpc.WxMsg)
@@ -13,11 +16,16 @@ func Setup() []*Handler {
 	handlerEcho()
 	handlerAutoAcceptFriendInvite()
 	handlerDownloadFile()
+	handlerSpark()
 
 	list := make([]*Handler, 0)
 
-	for _, v := range handlers {
-		list = append(list, v)
+	for k, v := range handlers {
+		cfg := config.Data.Callbacks[k]
+
+		if cfg["enable"] == "true" {
+			list = append(list, v)
+		}
 	}
 
 	return list

@@ -39,6 +39,12 @@ var rootCmd = &cobra.Command{
 		if config.Data.Rpc.Enable {
 			client := rpc.NewClient(config.Data.Rpc.Host, config.Data.Rpc.Port)
 
+			if config.Data.Httpd.Enable {
+				httpd := httpd.NewHttpServer(client)
+				httpd.Start()
+				defer httpd.Close()
+			}
+
 			err = client.Connect()
 			if err != nil {
 				logs.Fatal(fmt.Sprintf("connect wx rpc client failed. err:%v", err))
@@ -54,12 +60,6 @@ var rootCmd = &cobra.Command{
 				if err != nil {
 					logs.Warn(fmt.Sprintf("register callback error:%v", err))
 				}
-			}
-
-			if config.Data.Httpd.Enable {
-				httpd := httpd.NewHttpServer(client)
-				httpd.Start()
-				defer httpd.Close()
 			}
 		}
 

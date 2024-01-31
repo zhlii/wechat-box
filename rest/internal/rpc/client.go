@@ -3,11 +3,14 @@ package rpc
 import (
 	"fmt"
 	"time"
+
+	"github.com/zhlii/wechat-box/rest/internal/logs"
 )
 
 type Client struct {
 	CmdClient *CmdClient
 	MsgClient *MsgClient
+	Usr       *UserInfo
 }
 
 func NewClient(host string, port int) *Client {
@@ -24,7 +27,38 @@ func NewClient(host string, port int) *Client {
 }
 
 func (c *Client) Connect() error {
-	return c.CmdClient.socket.conn(5)
+	err := c.CmdClient.socket.conn(5)
+	if err != nil {
+		return err
+	}
+
+	go func(client *Client) {
+		for {
+			isLogin, err := client.CmdClient.IsLogin()
+
+			if err != nil {
+				logs.Error(err.Error())
+				time.Sleep(10 * time.Second)
+				continue
+			}
+
+			if isLogin {
+				break
+			}
+
+			logs.Info("not login, sleeping for 5s...")
+			time.Sleep(5 * time.Second)
+		}
+
+		usr, err := client.CmdClient.GetSelfInfo()
+		if err != nil {
+			logs.Error(fmt.Sprintf("get current user failed. %v", err))
+		} else {
+			client.Usr = usr
+		}
+	}(c)
+
+	return nil
 }
 
 func (c *Client) RegisterCallback(callback MsgCallback) error {

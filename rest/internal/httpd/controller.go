@@ -1,12 +1,14 @@
 package httpd
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 
 	"github.com/zhlii/wechat-box/rest/internal/helper"
+	"github.com/zhlii/wechat-box/rest/internal/logs"
 	"github.com/zhlii/wechat-box/rest/internal/rpc"
 )
 
@@ -30,7 +32,11 @@ type CommonPayload struct {
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /is_login [post]
 func (wc *Controller) isLogin(c *gin.Context) {
-	c.Set("Data", wc.CmdClient.IsLogin())
+	isLogin, err := wc.CmdClient.IsLogin()
+	if err != nil {
+		logs.Error(fmt.Sprintf("call IsLogin error: %v", err))
+	}
+	c.Set("Data", isLogin)
 }
 
 // @Summary 登录二维码
@@ -41,7 +47,7 @@ func (wc *Controller) isLogin(c *gin.Context) {
 // @Router /login_qr [post]
 func (wc *Controller) loginQr(c *gin.Context) {
 
-	if wc.CmdClient.IsLogin() {
+	if isLogin, _ := wc.CmdClient.IsLogin(); isLogin {
 		c.Set("Error", "微信已登录")
 		return
 	}
@@ -53,30 +59,6 @@ func (wc *Controller) loginQr(c *gin.Context) {
 		Result:  resp,
 		Error:   err,
 	})
-}
-
-// @Summary 获取登录账号wxid
-// @Produce json
-// @Success 200 {object} string
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /self_wxid [post]
-func (wc *Controller) getSelfWxid(c *gin.Context) {
-
-	c.Set("Data", wc.CmdClient.GetSelfWxid())
-
-}
-
-// @Summary 获取登录账号个人信息
-// @Produce json
-// @Success 200 {object} UserInfoPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /self_info [post]
-func (wc *Controller) getSelfInfo(c *gin.Context) {
-
-	c.Set("Data", wc.CmdClient.GetSelfInfo())
-
 }
 
 type UserInfoPayload struct {

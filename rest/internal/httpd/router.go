@@ -11,8 +11,6 @@ func Route(client *rpc.Client, rg *gin.RouterGroup) {
 	rg.GET("login_qr", ctrl.loginQr)
 
 	rg.GET("is_login", ctrl.isLogin)
-	rg.GET("self_wxid", ctrl.getSelfWxid)
-	rg.GET("self_info", ctrl.getSelfInfo)
 	rg.GET("msg_types", ctrl.getMsgTypes)
 
 	rg.GET("db_names", ctrl.getDbNames)

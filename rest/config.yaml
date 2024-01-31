@@ -10,3 +10,11 @@ rpc:
   host: localhost
   port: 8888
   enable: true
+
+callbacks:
+  download_file:
+    enable: true
+  auto_accept_friend_invite:
+    enable: true
+  echo:
+    enable: true
