@@ -1,4 +1,2 @@
 #!/usr/bin/env bash
-# wine 'C:\Program Files (x86)\Tencent\WeChat\WeChat.exe'
-# WINEDEBUG=-all wine /hook/wcf.exe start 8888 debug
-WINEDEBUG=-all wine /hook/rest.exe --config=/hook/config.yaml
+WINEDEBUG=-all wine /root/rest.exe --config=/root/config.yaml

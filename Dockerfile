@@ -11,8 +11,8 @@ RUN GO111MODULE=on CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="-s -
 FROM registry.cn-hangzhou.aliyuncs.com/xduo/wine-box:1.0.0
 
 COPY root/ /
-COPY --from=go-builder /tmp/rest/rest.exe /hook
-COPY --from=go-builder /tmp/rest/config.yaml /hook
+COPY --from=go-builder /tmp/rest/rest.exe /root
+COPY --from=go-builder /tmp/rest/config.yaml /root
 
 RUN bash -c 'nohup /entrypoint.sh 2>&1 &' && sleep 5 && /payloads.sh \
     && rm /tmp/.X0-lock 
