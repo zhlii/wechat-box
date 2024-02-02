@@ -36,6 +36,9 @@ func handlerAutoAcceptFriendInvite() {
 
 				matches := re.FindStringSubmatch(msg.Content)
 				if len(matches) > 1 {
+
+					c.FreshContacts()
+
 					nickName := matches[1]
 					logs.Debug(fmt.Sprintf("you and %s is friend now.", nickName))
 

@@ -153,18 +153,6 @@ type DbSqlQueryRequest struct {
 	Sql string `json:"sql"`
 }
 
-// @Summary 获取群列表
-// @Produce json
-// @Success 200 {object} []ContactPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /chatrooms [post]
-func (wc *Controller) getChatRooms(c *gin.Context) {
-
-	c.Set("Data", wc.CmdClient.GetChatRooms())
-
-}
-
 type GetChatRoomMembersRequest struct {
 	// 群聊 id
 	Roomid string `json:"roomid"`
@@ -630,8 +618,12 @@ type AvatarPayload struct {
 // @Router /contacts [post]
 func (wc *Controller) getContacts(c *gin.Context) {
 
-	c.Set("Data", wc.CmdClient.GetContacts())
+	contacts, err := wc.CmdClient.GetContacts()
+	if err != nil {
+		c.Set("Data", contacts)
+	}
 
+	c.Set("Data", []*ContactPayload{})
 }
 
 type ContactPayload struct {
@@ -651,18 +643,6 @@ type ContactPayload struct {
 	City string `json:"city,omitempty"`
 	// 性别
 	Gender int32 `json:"gender,omitempty"`
-}
-
-// @Summary 获取好友列表
-// @Produce json
-// @Success 200 {object} []ContactPayload
-// @Failure 400 {string} string "非法请求"
-// @Failure 500 {string} string "内部服务器错误"
-// @Router /friends [post]
-func (wc *Controller) getFriends(c *gin.Context) {
-
-	c.Set("Data", wc.CmdClient.GetFriends())
-
 }
 
 // @Summary 根据wxid获取个人信息

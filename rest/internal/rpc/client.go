@@ -11,6 +11,7 @@ type Client struct {
 	CmdClient *CmdClient
 	MsgClient *MsgClient
 	Usr       *UserInfo
+	Contacts  []*RpcContact
 }
 
 func NewClient(host string, port int) *Client {
@@ -56,9 +57,23 @@ func (c *Client) Connect() error {
 		} else {
 			client.Usr = usr
 		}
+
+		c.FreshContacts()
 	}(c)
 
 	return nil
+}
+
+func (s *Client) FreshContacts() {
+	contacts, err := s.CmdClient.GetContacts()
+
+	if err != nil {
+		logs.Error(fmt.Sprintf("get contacts error: %v", err))
+		s.Contacts = []*RpcContact{}
+	} else {
+		s.Contacts = contacts
+		logs.Debug(fmt.Sprintf("get %d contacts", len(s.Contacts)))
+	}
 }
 
 func (c *Client) RegisterCallback(callback MsgCallback) error {

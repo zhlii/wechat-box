@@ -101,18 +101,6 @@ func (c *CmdClient) DbSqlQuery(db, sql string) []map[string]any {
 	return rows
 }
 
-// 获取群聊列表
-// return []*RpcContact 群聊列表
-func (c *CmdClient) GetChatRooms() []*RpcContact {
-	chatrooms := []*RpcContact{}
-	for _, cnt := range c.GetContacts() {
-		if strings.HasSuffix(cnt.Wxid, "@chatroom") {
-			chatrooms = append(chatrooms, cnt)
-		}
-	}
-	return chatrooms
-}
-
 // 邀请群成员
 // param roomid string 群的 id
 // param wxids string 要邀请成员的 wxid, 多个用逗号`,`分隔
@@ -448,22 +436,13 @@ func (c *CmdClient) DecryptImage(src, dir string) (string, error) {
 
 // 获取完整通讯录
 // return []*RpcContact 完整通讯录
-func (c *CmdClient) GetContacts() []*RpcContact {
+func (c *CmdClient) GetContacts() ([]*RpcContact, error) {
 	req := &Request{Func: Functions_FUNC_GET_CONTACTS}
-	resp, _ := c.socket.call(req)
-	return resp.GetContacts().GetContacts()
-}
-
-// 获取好友列表
-// return []*RpcContact 好友列表
-func (c *CmdClient) GetFriends() []*RpcContact {
-	friends := []*RpcContact{}
-	for _, cnt := range c.GetContacts() {
-		if ContactType(cnt.Wxid) == "好友" {
-			friends = append(friends, cnt)
-		}
+	resp, err := c.socket.call(req)
+	if err != nil {
+		return nil, err
 	}
-	return friends
+	return resp.GetContacts().GetContacts(), nil
 }
 
 // 通过 wxid 查询微信号昵称等信息

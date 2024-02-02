@@ -17,8 +17,6 @@ func Route(client *rpc.Client, rg *gin.RouterGroup) {
 	rg.GET("db_tables", ctrl.getDbTables)
 	rg.GET("db_query_sql", ctrl.dbSqlQuery)
 
-	rg.GET("chatrooms", ctrl.getChatRooms)
-
 	rg.POST("invite_chatroom_members", ctrl.inviteChatroomMembers)
 	rg.POST("add_chatroom_members", ctrl.addChatRoomMembers)
 	rg.DELETE("del_chatroom_members", ctrl.delChatRoomMembers)
@@ -35,7 +33,6 @@ func Route(client *rpc.Client, rg *gin.RouterGroup) {
 
 	rg.GET("avatars", ctrl.getAvatars)
 	rg.GET("contacts", ctrl.getContacts)
-	rg.GET("friends", ctrl.getFriends)
 	rg.GET("user_info", ctrl.getInfoByWxid)
 	rg.POST("refresh_pyq", ctrl.refreshPyq)
 	rg.POST("receive_transfer", ctrl.receiveTransfer)

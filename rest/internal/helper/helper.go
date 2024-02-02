@@ -2,7 +2,9 @@ package helper
 
 import (
 	"errors"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/kbinani/screenshot"
 	"github.com/makiuchi-d/gozxing"
@@ -33,4 +35,14 @@ func WxLoginQrcode() (string, error) {
 		}
 	}
 	return "", errors.New("未找到二维码")
+}
+
+func Sleep() {
+	rand.Seed(time.Now().UnixNano())
+
+	// Generate a random number between 1 and 3 seconds
+	randomSeconds := rand.Intn(3) + 1
+
+	// Sleep for the generated random number of seconds
+	time.Sleep(time.Duration(randomSeconds) * time.Second)
 }

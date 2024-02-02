@@ -47,3 +47,7 @@ func Init(path string) {
 
 	Data = conf
 }
+
+func SaveConfig() {
+
+}
