@@ -35,100 +35,50 @@ func handlerSpark() {
 					// }
 				} else {
 					if msg.IsSelf && msg.Receiver == c.Usr.Wxid { // 自己和自己对话
-						answer, err := spark_ask(msg.Sender, msg.Content+"\n分析上面这句话的语义, 返回动作, 对象等属性, 要求是json格式", cfg["appid"], cfg["apiKey"], cfg["apiSecret"])
-						if err != nil {
-							logs.Error(fmt.Sprintf("call spark error: %v", err))
-							c.CmdClient.SendTxt(err.Error(), msg.Sender, "")
-						} else {
-							var r map[string]interface{}
-							err := json.Unmarshal([]byte(answer), &r)
-							if err != nil {
-								c.CmdClient.SendTxt(err.Error()+"\n"+answer, msg.Sender, "")
-							} else {
-								action, ok := r["动作"].(string)
 
-								if !ok {
-									c.CmdClient.SendTxt(answer, msg.Sender, "")
-									return
-								}
+						if strings.HasPrefix(msg.Content, "开启自动回复") || strings.HasPrefix(msg.Content, "关闭自动回复") {
+							username := msg.Content[18:]
 
-								var users = []string{}
-								user, ok := r["对象"].(string)
-								if ok {
-									users = append(users, user)
-								} else if us, ok := r["对象"].([]string); ok {
-									users = us
-								} else {
-									c.CmdClient.SendTxt(answer, msg.Sender, "")
-									return
-								}
+							if len(username) == 0 {
+								return
+							}
 
-								if strings.Contains(action, "回复") {
-									if len(users) == 0 {
-										c.CmdClient.SendTxt(answer, msg.Sender, "")
-										return
-									}
+							whilelist := strings.Split(cfg["whitelist"], ",")
 
-									whilelist := strings.Split(cfg["whitelist"], ",")
-
-									for _, user := range users {
-										wxId := ""
-										for _, contact := range c.Contacts {
-											if user == contact.Name || user == contact.Remark {
-												wxId = contact.Wxid
-												break
-											}
-										}
-
-										if len(wxId) == 0 {
-											c.CmdClient.SendTxt("未找到"+user, msg.Sender, "")
-											break
-										}
-
-										if strings.Contains(action, "开启") {
-											whilelist = append(whilelist, wxId)
-											c.CmdClient.SendTxt("🤖", wxId, "")
-										} else if strings.Contains(action, "关闭") {
-											whilelist = helper.RemoveElement(whilelist, wxId)
-										}
-
-										cfg["whitelist"] = strings.Join(whilelist, ",")
-
-										c.CmdClient.SendTxt("👌", msg.Sender, "")
-									}
-								} else if action == "发信息" {
-									if len(users) == 0 {
-										c.CmdClient.SendTxt(answer, msg.Sender, "")
-										return
-									}
-
-									message, ok := r["信息内容"].(string)
-									if !ok || len(message) == 0 {
-										c.CmdClient.SendTxt(answer, msg.Sender, "")
-										return
-									}
-
-									for _, user := range users {
-										wxId := ""
-										for _, contact := range c.Contacts {
-											if user == contact.Name || user == contact.Remark {
-												wxId = contact.Wxid
-												break
-											}
-										}
-
-										if len(wxId) == 0 {
-											c.CmdClient.SendTxt("未找到"+user, msg.Sender, "")
-											break
-										}
-										c.CmdClient.SendTxt(message, wxId, "")
-										helper.Sleep()
-									}
-								} else {
-									c.CmdClient.SendTxt(answer, msg.Sender, "")
+							wxId := ""
+							for _, contact := range c.Contacts {
+								if username == contact.Name || username == contact.Remark {
+									wxId = contact.Wxid
+									break
 								}
 							}
+
+							if len(wxId) == 0 {
+								c.CmdClient.SendTxt("未找到"+username, msg.Sender, "")
+								break
+							}
+
+							if strings.HasPrefix(msg.Content, "开启") {
+								whilelist = append(whilelist, wxId)
+								c.CmdClient.SendTxt("🤖", wxId, "")
+							} else if strings.HasPrefix(msg.Content, "关闭") {
+								whilelist = helper.RemoveElement(whilelist, wxId)
+							}
+
+							cfg["whitelist"] = strings.Join(whilelist, ",")
+
+							c.CmdClient.SendTxt("👌", msg.Sender, "")
+
+						} else {
+							answer, err := spark_ask(msg.Sender, msg.Content, cfg["appid"], cfg["apiKey"], cfg["apiSecret"])
+							if err != nil {
+								logs.Error(fmt.Sprintf("call spark error: %v", err))
+								c.CmdClient.SendTxt(err.Error(), msg.Sender, "")
+							} else {
+								c.CmdClient.SendTxt(answer, msg.Sender, "")
+							}
 						}
+
 					} else if strings.Contains(cfg["whitelist"], msg.Sender) {
 						answer, err := spark_ask(msg.Sender, msg.Content, cfg["appid"], cfg["apiKey"], cfg["apiSecret"])
 						if err != nil {
