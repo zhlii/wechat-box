@@ -27,12 +27,21 @@ func handlerSpark() {
 			switch msg.Type {
 			case 1:
 				if msg.IsGroup {
-					// answer, err := Invoke(msg.Roomid, msg.Content, cfg["appid"], cfg["apiKey"], cfg["apiSecret"])
-					// if err != nil {
-					// 	logs.Error(fmt.Sprintf("call spark error: %v", err))
-					// } else {
-					// 	c.CmdClient.SendTxt(answer, msg.Roomid, "")
-					// }
+					atme := fmt.Sprintf("@%s", c.Usr.Name)
+					if strings.Contains(msg.Content, atme) {
+						q := strings.ReplaceAll(msg.Content, atme, "")
+
+						if len(q) > 0 {
+							answer, err := spark_ask(msg.Roomid, q, cfg["appid"], cfg["apiKey"], cfg["apiSecret"])
+							if err != nil {
+								logs.Error(fmt.Sprintf("call spark error: %v", err))
+							} else {
+								c.CmdClient.SendTxt(answer, msg.Roomid, "")
+							}
+						}
+					} else {
+						logs.Debug(fmt.Sprintf("not @me, ignore\n"))
+					}
 				} else {
 					if msg.IsSelf && msg.Receiver == c.Usr.Wxid { // 自己和自己对话
 
