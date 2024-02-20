@@ -10,6 +10,7 @@ import (
 	"github.com/zhlii/wechat-box/rest/internal/boot"
 	"github.com/zhlii/wechat-box/rest/internal/callback"
 	"github.com/zhlii/wechat-box/rest/internal/config"
+	"github.com/zhlii/wechat-box/rest/internal/db"
 	"github.com/zhlii/wechat-box/rest/internal/httpd"
 	"github.com/zhlii/wechat-box/rest/internal/logs"
 	"github.com/zhlii/wechat-box/rest/internal/rpc"
@@ -28,12 +29,17 @@ var rootCmd = &cobra.Command{
 
 		logs.CreateLogger()
 
+		err := db.Connect()
+		if err != nil {
+			logs.Fatal(fmt.Sprintf("init db failed. err: %v", err))
+		}
+		defer db.Destory()
+
 		boot := &boot.Boot{WcfPort: config.Data.Rpc.Port}
-		err := boot.InitSDK()
+		err = boot.InitSDK()
 		if err != nil {
 			logs.Fatal(fmt.Sprintf("boot wx failed. err:%v", err))
 		}
-
 		defer boot.DestorySDK()
 
 		if config.Data.Rpc.Enable {

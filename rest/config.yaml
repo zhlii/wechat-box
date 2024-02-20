@@ -2,6 +2,13 @@ common:
   log_level: info
   is_prod: true
 
+database:
+  user: root
+  password: mysqlpwd
+  host: mysql
+  port: 3306
+  database: wx
+
 httpd:
   addr: 0.0.0.0:80
   enable: true
@@ -12,7 +19,7 @@ rpc:
   enable: true
 
 callbacks:
-  download_file:
+  save_message:
     enable: true
   auto_accept_friend_invite:
     enable: true

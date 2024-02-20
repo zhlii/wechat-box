@@ -15,7 +15,7 @@ func Setup() []*Handler {
 	handlerLog()
 	handlerEcho()
 	handlerAutoAcceptFriendInvite()
-	handlerDownloadFile()
+	handlerSaveMessage()
 	handlerSpark()
 
 	list := make([]*Handler, 0)

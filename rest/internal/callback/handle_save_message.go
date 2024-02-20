@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zhlii/wechat-box/rest/internal/db"
+	"github.com/zhlii/wechat-box/rest/internal/db/tables"
 	"github.com/zhlii/wechat-box/rest/internal/logs"
 	"github.com/zhlii/wechat-box/rest/internal/rpc"
 )
@@ -28,10 +30,27 @@ func genDownloadDir(file string) (string, error) {
 	return path, nil
 }
 
-func handlerDownloadFile() {
-	handlers["download_file"] = &Handler{
+func handlerSaveMessage() {
+	handlers["save_message"] = &Handler{
 		Callback: func(c *rpc.Client, msg *rpc.WxMsg) {
+			receiver := c.Usr.Wxid
+			if msg.IsGroup {
+				receiver = msg.Roomid
+			}
 			switch msg.Type {
+			case 1:
+				result := db.Db.Create(&tables.Message{
+					MsgId:    msg.Id,
+					Type:     1,
+					IsGroup:  msg.IsGroup,
+					Sender:   msg.Sender,
+					Receiver: receiver,
+					Content:  msg.Content,
+				})
+				if result.Error != nil {
+					logs.Error(fmt.Sprintf("save message error. %v", result.Error))
+					return
+				}
 			case 3:
 				dir, err := genDownloadDir(msg.Extra)
 
@@ -55,6 +74,20 @@ func handlerDownloadFile() {
 					} else {
 						if path != "" {
 							logs.Debug(path)
+
+							result := db.Db.Create(&tables.Message{
+								MsgId:    msg.Id,
+								Type:     2,
+								IsGroup:  msg.IsGroup,
+								Sender:   msg.Sender,
+								Receiver: receiver,
+								Content:  strings.ReplaceAll(path, string(filepath.Separator), "/"),
+							})
+							if result.Error != nil {
+								logs.Error(fmt.Sprintf("save message error. %v", result.Error))
+								return
+							}
+
 							break
 						} else {
 							time.Sleep(time.Second)
