@@ -14,7 +14,5 @@ services:
             - "8888:8888"
             - "8889:8889"
         volumes:
-            - "./WeChat_Files/:/root/WeChat Files/"
-        extra_hosts:
-            - "dldir1.qq.com:127.0.0.1"
+            - "./WeChat_Files/:/root/WeChat Files/"        
         tty: true

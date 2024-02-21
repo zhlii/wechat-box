@@ -1,13 +1,1 @@
-Debug
-Release
-/hook/.vs
-/hook/Out
-/.vs
-/hook/rpc/tool/proto/__pycache__
-/hook/rpc/proto
 .vscode
-rest/rest.exe
-rest/rest.log
-rest/rest
-rest/rest.err.log
-rest/config.local.yaml

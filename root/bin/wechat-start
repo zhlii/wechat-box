@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-WINEDEBUG=-all wine /root/rest.exe --config=/root/config.yaml
+wine 'C:\Program Files (x86)\Tencent\WeChat\WeChat.exe'
