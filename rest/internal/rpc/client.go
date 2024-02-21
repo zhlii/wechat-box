@@ -78,7 +78,7 @@ func (s *Client) FreshContacts() {
 
 func (c *Client) RegisterCallback(callback MsgCallback) error {
 	if c.MsgClient.callbacks == nil {
-		if _, err := c.CmdClient.EnableMsgReciver(true); err != nil {
+		if _, err := c.CmdClient.EnableMsgReciver(false); err != nil {
 			return fmt.Errorf("failed to enable msg server. error: %v", err)
 		}
 

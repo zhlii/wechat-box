@@ -28,7 +28,7 @@ func (b *Boot) InitSDK() error {
 
 	callFuncInDll(b.SdkFilePath, "WxInitSDK", uintptr(1), uintptr(b.WcfPort))
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 10)
 
 	return nil
 }
