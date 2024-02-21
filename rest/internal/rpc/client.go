@@ -33,34 +33,6 @@ func (c *Client) Connect() error {
 		return err
 	}
 
-	go func(client *Client) {
-		for {
-			isLogin, err := client.CmdClient.IsLogin()
-
-			if err != nil {
-				logs.Error(err.Error())
-				time.Sleep(10 * time.Second)
-				continue
-			}
-
-			if isLogin {
-				break
-			}
-
-			logs.Info("not login, sleeping for 5s...")
-			time.Sleep(5 * time.Second)
-		}
-
-		usr, err := client.CmdClient.GetSelfInfo()
-		if err != nil {
-			logs.Error(fmt.Sprintf("get current user failed. %v", err))
-		} else {
-			client.Usr = usr
-		}
-
-		c.FreshContacts()
-	}(c)
-
 	return nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zhlii/wechat-box/rest/internal/boot"
@@ -57,20 +58,49 @@ var rootCmd = &cobra.Command{
 			}
 			defer client.Close()
 
-			for _, h := range callback.Setup() {
-				handler := h
-				err = client.RegisterCallback(func(msg *rpc.WxMsg) {
-					handler.Callback(client, msg)
-				})
+			go func(client *rpc.Client) {
+				for {
+					isLogin, err := client.CmdClient.IsLogin()
 
-				if err != nil {
-					logs.Warn(fmt.Sprintf("register callback error:%v", err))
+					if err != nil {
+						logs.Error(err.Error())
+						time.Sleep(10 * time.Second)
+						continue
+					}
+
+					if isLogin {
+						break
+					}
+
+					logs.Info("not login, sleeping for 5s...")
+					time.Sleep(5 * time.Second)
 				}
-			}
+
+				usr, err := client.CmdClient.GetSelfInfo()
+				if err != nil {
+					logs.Error(fmt.Sprintf("get current user failed. %v", err))
+				} else {
+					client.Usr = usr
+				}
+
+				// 开启回调
+				for _, h := range callback.Setup() {
+					handler := h
+					err = client.RegisterCallback(func(msg *rpc.WxMsg) {
+						handler.Callback(client, msg)
+					})
+
+					if err != nil {
+						logs.Warn(fmt.Sprintf("register callback error:%v", err))
+					}
+				}
+
+				client.FreshContacts()
+			}(client)
 		}
 
 		// 等待服务器停止信号
-		chSig := make(chan os.Signal)
+		chSig := make(chan os.Signal, 1)
 		signal.Notify(chSig, syscall.SIGINT, syscall.SIGTERM)
 		<-chSig
 
