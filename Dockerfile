@@ -1,5 +1,5 @@
 # https://github.com/zhlii/wine-box
-FROM registry.cn-hangzhou.aliyuncs.com/xduo/wine-box:1.0.1
+FROM registry.cn-hangzhou.aliyuncs.com/xduo/wine-box:1.0.2
 
 COPY root/ /
 
