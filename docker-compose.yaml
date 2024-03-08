@@ -11,8 +11,6 @@ services:
             VNC_PASSWORD: "1"
         ports:
             - "8080:8080"
-            - "8888:8888"
-            - "8889:8889"
         volumes:
             - "./WeChat_Files/:/root/WeChat Files/"        
         tty: true
